@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body{
   min-height: 100vh;
-  background: linear-gradient(#232630, #050507);
+  background: linear-gradient(#04aa6a, #04aa6a);
 }
