@@ -3,7 +3,16 @@ import { Header } from "../../components/Header/index"
 import { Input } from "../../components/Input";
 
 import { FiTrash } from 'react-icons/fi'
-
+import {db} from '../../services/firebaseConnection'
+import{
+  addDoc, 
+  collection,
+  onSnapshot,
+  query, 
+  orderBy,
+  doc, 
+  deleteDoc,
+} from 'firebase/firestore'
 
 export function Admin(){
   const [nameInput, setNameInput] = useState("")
@@ -11,6 +20,32 @@ export function Admin(){
   const [textColorInput, setTextColorInput] = useState("#f1f1f1")
   const [backgroundColorInput, setBackgroundColorInput] = useState("#121212")
 
+
+  function registro(e: FormEvent){
+    e.preventDefault();
+    if(nameInput === " " || urlInput === ""){
+      alert("Preencha todos os campos")
+      return
+    }
+
+    addDoc(collection(db,"links"),{
+      name:nameInput,
+      url: urlInput,
+      bg: backgroundColorInput,
+      color: textColorInput,
+      created: new Date()
+
+    })
+    .then(()=>{
+      setNameInput("")
+      setUrlInput("")
+      console.log("CADASTRADO COM SUCESSO")
+
+    })
+    .catch((error)=>{
+      console.log("ERRO AO CADASTRAR NO BANCO"+error)
+    })
+  }
 
   return(
     <div className="flex items-center flex-col min-h-screen pb-7 px-2">
