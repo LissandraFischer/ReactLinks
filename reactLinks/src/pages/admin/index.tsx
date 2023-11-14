@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react'
+import { FormEvent, useState, useEffect} from 'react'
 import { Header } from "../../components/Header/index"
 import { Input } from "../../components/Input";
 
@@ -14,11 +14,46 @@ import{
   deleteDoc,
 } from 'firebase/firestore'
 
+interface LinksProps{
+  id: string;
+  name: string;
+  url: string;
+  bg: string;
+  color: string;
+}
+
 export function Admin(){
   const [nameInput, setNameInput] = useState("")
   const [urlInput, setUrlInput] = useState("")
   const [textColorInput, setTextColorInput] = useState("#f1f1f1")
   const [backgroundColorInput, setBackgroundColorInput] = useState("#121212")
+
+  const [links, setLinks] = useState<LinksProps[]>([])
+
+  useEffect(()=>{
+    const linksRef = collection(db, "links");
+    const queryRef = query(linksRef, orderBy("created","asc"));
+
+    const unsub = onSnapshot(queryRef, (snapshot)=>{
+      let lista = [] as LinksProps[];
+
+      snapshot.forEach((doc)=>{
+        lista.push({
+          id:doc.id,
+          name:doc.data().name,
+          url: doc.data().url,
+          bg: doc.data().bg,
+          color: doc.data().color
+
+        })
+      })
+      setLinks(lista);
+    })
+      return()=>{
+        unsub();
+      }
+  
+  },[])
 
 
   function registro(e: FormEvent){
@@ -45,6 +80,12 @@ export function Admin(){
     .catch((error)=>{
       console.log("ERRO AO CADASTRAR NO BANCO"+error)
     })
+  }
+
+  async function deleteLink(id: string){
+    const docRef = doc(db,"links", id)
+    await deleteDoc(docRef)
+
   }
 
   return(
@@ -109,20 +150,24 @@ export function Admin(){
         Meus links
       </h2>
 
-      <article 
+      {links.map((link) =>(
+        <article 
+        key={link.id}
         className="flex items-center justify-between w-11/12 max-w-xl rounded py-3 px-2 mb-2 select-none"
-        style={{ backgroundColor: "#2563EB", color: "#FFF" }}
+        style={{ backgroundColor: link.bg, color: link.color }}
       >
-        <p>Canal do yotube</p>
+        <p>{link.name}</p>
         <div>
           <button
             className="border border-dashed p-1 rounded bg-neutral-900"
+            onClick={ () => deleteLink(link.id) }
           >
             <FiTrash size={18} color="#FFF"/>
           </button>
         </div>
       </article>
 
+      ))}
     </div>
   )
 }
