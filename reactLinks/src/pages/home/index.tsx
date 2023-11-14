@@ -1,9 +1,40 @@
+import { useEffect, useState } from 'react'
 
 import { Social } from '../../components/Social'
 
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa'
 
+import {db} from '../../service/firebaseConnection'
+import{
+  getDocs, 
+  collection,
+  orderby, 
+  query,
+  doc,
+  getDoc,
+} from 'firebase/firestore'
+import { LinkProps } from 'react-router-dom'
+
+interface LinksProps{
+  id: string;
+  name: string;
+  url: string;
+  bg: string;
+  color: string;
+}
+
+interface socialLinksProp{
+  facebook: string;
+  youtube: string;
+  instagram: string;
+}
+
+
 export function Home(){
+  const [links, setLinks] = useState<LinkProps[]>([]);
+  const [socialLinks, setSocialLnks] = useState<socialLinksProp>()
+
+
   return(
     <div className="flex flex-col w-full py-4 items-center justify-center">
       <h1 className="md:text-4xl  text-3xl font-bold text-white mt-20">Instituto Federal Catarinense</h1>
